@@ -15,6 +15,7 @@ struct VerdadReto: View {
     var body: some View {
         NavigationView {
             ZStack {
+                ///Vista de Triangulo con pico pa abajo
                 TriangleUp()
                     .fill(LinearGradient(gradient: Gradient(colors: [.red, .purple]), startPoint: .top, endPoint: .bottom))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -25,8 +26,7 @@ struct VerdadReto: View {
                     }
                     .background(NavigationLink("", destination: VerdadView(), isActive: $isShowingVerdadView))
                     
-                    
-                                    
+                ///Vista de Triangulo con pico pa arriba
                 TriangleDown()
                     .fill(LinearGradient(gradient: Gradient(colors: [.init(red: 0.000, green: 0.188, blue: 1.000), .purple]), startPoint: .bottom, endPoint: .top))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -63,7 +63,7 @@ struct VerdadReto: View {
         }
     }
 }
-
+//Struct de triangulo con pico pa arriba
 struct TriangleDown: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -75,6 +75,7 @@ struct TriangleDown: Shape {
     }
 }
 
+//Struct de triangulo con pico pa abajo
 struct TriangleUp: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
@@ -86,18 +87,30 @@ struct TriangleUp: Shape {
     }
 }
 
+//Vista de Preguntas
 struct VerdadView: View {
-    var body: some View{
-        Text("Este es el Verdad View")
+    @State var pregunta: String = ""
+    let arrayOfQuestions:[String] = ["Cual es la persona que más te ha gustado en la vida?",
+                                     "En escala de 1 a 10 valora a los demas jugaores",
+                                     "A quien detestas más entre los demas jugaodres",
+                                     "Con quien estuvistes por última vez"]
+    if let randomQuestion = arrayOfQuestions.randomElement() {
+        pregunta = randomQuestion
+    }
+    var body: some View {
+        Text("\(pregunta)")
+        
     }
 }
 
+//Vista de Retos
 struct RetoView: View{
     var body: some View{
         Text("Este es el Reto View")
     }
 }
 
+//Vista de Canvas
 struct VerdadReto_Previews: PreviewProvider {
     static var previews: some View {
         VerdadReto()
