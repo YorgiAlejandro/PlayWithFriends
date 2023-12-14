@@ -4,13 +4,18 @@
 //
 //  Created by Yorgi Del Rio on 11/16/23.
 //
-
 import SwiftUI
 
+
+///Vistas
+
+///Vista principal VerdadReto
 struct VerdadReto: View {
-    
+    @Binding var listOfPlayers: [String]
+    @State private var playerID = UUID()
     @State var isShowingVerdadView: Bool = false
     @State var isShowingRetoView: Bool = false
+    @State var name: String = ""
     
     var body: some View {
         NavigationView {
@@ -22,7 +27,6 @@ struct VerdadReto: View {
                     .contentShape(TriangleUp())
                     .onTapGesture {
                         self.isShowingVerdadView = true
-                        print("Verdad was pushed")
                     }
                     .background(NavigationLink("", destination: VerdadView(), isActive: $isShowingVerdadView))
                     
@@ -47,72 +51,90 @@ struct VerdadReto: View {
                         .contentShape(TriangleDown())
                         .onTapGesture {
                             self.isShowingRetoView = true
-                            print("Reto was pushed")
                         }
                         .background(NavigationLink("", destination: RetoView(), isActive: $isShowingRetoView))
-                Button("Yorgi's turn"){
-                    print("Yorgi button was pushed")
-                }.padding(20)
+                Button("\(name)'s turn"){
+                    name = listOfPlayers.randomElement() ?? ""
+                    playerID = UUID()
+                }
+                    .padding(20)
                     .foregroundColor(.white)
                     .font(.system(size: 40, weight: .bold, design: .rounded))
                     .background(LinearGradient(gradient: Gradient(colors: [.blue, .red]), startPoint: .top, endPoint: .bottom))
                     .cornerRadius(20)
                     .rotationEffect(.degrees(61))
+                    .id(playerID)
             }.frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(LinearGradient(gradient: Gradient(colors: [.red, .init(red: 0.000, green: 0.188, blue: 1.000)]), startPoint: .top, endPoint: .bottom))
         }
-    }
-}
-//Struct de triangulo con pico pa arriba
-struct TriangleDown: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
-        return path
+        .onAppear(perform: {
+            name = listOfPlayers.randomElement() ?? ""
+                    })
     }
 }
 
-//Struct de triangulo con pico pa abajo
-struct TriangleUp: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
-    }
-}
-
-//Vista de Preguntas
-struct VerdadView: View {
-    @State var pregunta: String = ""
-    let arrayOfQuestions:[String] = ["Cual es la persona que más te ha gustado en la vida?",
-                                     "En escala de 1 a 10 valora a los demas jugaores",
-                                     "A quien detestas más entre los demas jugaodres",
-                                     "Con quien estuvistes por última vez"]
-    if let randomQuestion = arrayOfQuestions.randomElement() {
-        pregunta = randomQuestion
-    }
+///Vista de añadir Players
+struct Players :  View {
+    @State var listOfPlayers: [String]
+    @State var newName: String = ""
     var body: some View {
-        Text("\(pregunta)")
-        
+        NavigationView {
+            Form{
+                Section{
+                    TextField("Añade a todos los participantes", text: $newName )
+                                    .autocapitalization(.none)
+                                    .disableAutocorrection(true)
+                                    .padding()
+                } header: {
+                    HStack {
+                        Image(systemName: "gamecontroller.fill").resizable().scaledToFit().frame(width: 60).foregroundColor(.blue)
+                        VStack{
+                            Text("Verdad").foregroundColor(.blue).bold().font(.title)
+                            Text("Reto").foregroundColor(.red).bold().font(.title)
+                        }
+                        
+                    }
+                    HStack {
+                        Button("Añadir"){
+                            if !newName.isEmpty {
+                                listOfPlayers = listOfPlayers.filter { !$0.isEmpty }
+                                listOfPlayers.append(newName)
+                                newName = ""
+                            }
+                        }.buttonStyle(.borderedProminent).tint(.pink)
+                        Spacer()
+                        NavigationLink("Listo") {
+                            VerdadReto(listOfPlayers: $listOfPlayers)
+                        }.buttonStyle(.borderedProminent).tint(.blue)
+                    }
+                }
+                List{
+                    Section {
+                        ForEach(listOfPlayers, id: \.self) { participante in
+                            Text("\(participante)").foregroundColor(.green).bold().font(.title2)
+                        }
+                    } header: {
+                        Label("Participantes", systemImage: "person.3.sequence.fill")
+
+                    }
+                }
+            }
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.blue)
     }
 }
 
-//Vista de Retos
-struct RetoView: View{
-    var body: some View{
-        Text("Este es el Reto View")
-    }
-}
 
-//Vista de Canvas
-struct VerdadReto_Previews: PreviewProvider {
+
+
+
+
+
+///Vista de Canvas
+struct Player_Previews: PreviewProvider {
     static var previews: some View {
-        VerdadReto()
+        Players(listOfPlayers: [""])
     }
 }
+
+
